@@ -1,10 +1,11 @@
 import { ChatWindow } from "@/components/ChatWindow";
+import { PersonalizeChatWindow } from "@/components/PersonalizeChatWindow";
 
 export default function Home() {
   const InfoCard = (
     <div className="p-4 md:p-8 rounded bg-[#25252d] w-full max-h-[85%] overflow-hidden">
       <h1 className="text-3xl md:text-4xl mb-4">
-        ▲ Next.js + LangChain.js 🦜🔗
+        Sitecore Personalize AI Assistant
       </h1>
       <ul>
         <li className="text-l">
@@ -69,12 +70,10 @@ export default function Home() {
     </div>
   );
   return (
-    <ChatWindow
-      endpoint="api/chat"
+    <PersonalizeChatWindow 
       emoji="🏴‍☠️"
-      titleText="Patchy the Chatty Pirate"
-      placeholder="I'm an LLM pretending to be a pirate! Ask me about the pirate life!"
+      placeholder="I am your Sitecore Personalize AI Assistant"
       emptyStateComponent={InfoCard}
-    ></ChatWindow>
+    ></PersonalizeChatWindow>
   );
 }
