@@ -168,7 +168,7 @@ export function PersonalizeChatWindow(props: {
               </svg>
               <span className="sr-only">Loading...</span>
             </div>
-            <span className={(chatEndpointIsLoading || intermediateStepsLoading) ? "hidden" : ""}>Send</span>
+            <span className={(chatEndpointIsLoading || intermediateStepsLoading) ? "hidden" : ""}>Send Now</span>
           </button>
         </div>
       </form>
