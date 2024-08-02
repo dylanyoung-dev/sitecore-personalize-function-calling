@@ -3,6 +3,9 @@ import { ChatOpenAI } from '@langchain/openai'
 import { Message as VercelChatMessage, StreamingTextResponse } from 'ai'
 import { PromptTemplate } from '@langchain/core/prompts';
 import { HttpResponseOutputParser } from 'langchain/output_parsers'
+import { Client, IClientInitOptions, RegionOptions, TemplateType } from 'sitecore-personalize-tenant-sdk';
+import { z } from 'zod';
+import { tool } from '@langchain/core/tools';
 
 export const runtime = "edge";
 
@@ -11,10 +14,28 @@ const formatMessage = (message: VercelChatMessage) => {
 };
 
 const Template = `
-    You are a Software Engineer/Strategist that is expert in writing code for Sitecore Personalize.
+    You are a Software Engineer/Strategist that is an expert in writing code for Sitecore Personalize.
+    Your goal is to help the user create various assets in Sitecore Personalize based on the functions passed in.
 
-    You will write code that is only is ECMAScript 5.0 format, and should replace console.log with print() instead.
+    All code samples should be is JavaScript ES5.
 `
+
+const experienceCreateSchema = z.object({
+    name: z.string()
+});
+
+const experienceCreateTool = tool(
+    async ({ name }: z.infer<typeof experienceCreateSchema>) => {
+      // Functions must return strings
+      console.log(`Calling Experience Create ${name}`)
+      return `Experience ${name} created successfully.`;
+    },
+    {
+        name: 'ExperienceCreator',
+        description: 'Can create Sitecore Personalize experiences.',
+        schema: experienceCreateSchema
+    }
+  );
 
 export const POST = async (req: NextRequest) => {
     try {
@@ -29,9 +50,11 @@ export const POST = async (req: NextRequest) => {
             model: "gpt-4o"
         });
 
+        const modelWithTools = model.bindTools([experienceCreateTool])
+
         const outputParser = new HttpResponseOutputParser();
 
-        const chain = prompt.pipe(model).pipe(outputParser);
+        const chain = prompt.pipe(modelWithTools).pipe(outputParser);
 
         const stream = await chain.stream({
             chat_history: formattedPreviousMessages.join("\n"),
